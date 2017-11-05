@@ -1,0 +1,50 @@
+div#app {
+  display: inline-block;
+  position: absolute;
+  box-sizing: border-box;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+div#app div#navigation {
+  display: inline-block;
+  position: absolute;
+  box-sizing: border-box;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 50px;
+  background-color: rgb(50,50,50);
+}
+div#app div#navigation button {
+  position: relative;
+  height: 100%;
+  box-sizing: border-box;
+  float: left;
+  padding-left: 15px;
+  padding-right: 15px;
+  background-color: transparent;
+  border: none;
+  font-size: 15px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: white;
+}
+div#app div#page-content {
+  display: inline-block;
+  position: absolute;
+  top: 50px;
+  bottom: 0px;
+  left: 0;
+  right: 0;
+}
+div#app div#page-content div.page {
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 25px;
+}

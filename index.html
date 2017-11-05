@@ -3,17 +3,24 @@
 <html>
   <head>
     <title>REACTION GIF COLLECTION</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
   </head>
   <body>
     <div id="app">
-      <collection></collection>
-      <search></search>
+      <div id="navigation">
+        <button @click="upload()">UPLOAD</button>
+        <button @click="goTo('collection')">Collection</button>
+        <button @click="goTo('search')">Search</button>
+      </div>
+      <div id="page-content">
+        <collection v-show="pages.collection"></collection>
+        <search v-show="pages.search"></search>
+      </div>
+
+      <upload-form v-if="uploadForm"></upload-form>
     </div>
 
-
     <input style="display: none;" id="upload-input" type="file" name="uploads[]">
-    <img style="width: 50px; height: 50px;" src="img/test.jpg">
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
     <script src="js/vue.js"></script>
     <script src="js/axios.js"></script>
     <script src="js/app.js"></script>

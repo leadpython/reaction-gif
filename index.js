@@ -6,8 +6,9 @@ var path = require('path');
 var app = express();
 var url = 'mongodb://localhost:27017/reaction-gif';
 
-var Gif = require('./api/gif');
+var gifs = require('./api/gif');
 
+app.use('/css', express.static(path.join(__dirname, '/css')));
 app.use('/js', express.static(path.join(__dirname, '/scripts')));
 app.use('/img', express.static(path.join(__dirname, '/gifs')));
 
@@ -19,9 +20,9 @@ app.get('/', function(request, response){
 
 app.use('/api', routes);
 
-mongodb.MongoClient.connect(url , function(error, database) {
-  Gif.setDatabase(database);
-  app.listen(process.env.PORT || 8080, function () {
+mongodb.MongoClient.connect(url, function(error, database) {
+  gifs.setDatabase(database);
+  app.listen(8080, function () {
     console.log("App now running!");
   });
 });
