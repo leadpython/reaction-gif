@@ -13,7 +13,7 @@ var Gif = Vue.component('gif', {
   },
   template: `
     <div class="gif-component">
-      <div class="image-container"><img :id="'gif-image-' + meme.name" :src="'/img/' + meme.name + '.jpg'"></div>
+      <div class="image-container"><img :id="'gif-image-' + meme.name" :src="'/img/' + meme.name + '.gif'"></div>
       <div><label class="name">{{meme.name}}</label></div>
       <div><span class="tag" v-for="tag in meme.tags" @click="searchTag(tag)">{{tag}}</span></div>
       <div>

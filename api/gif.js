@@ -58,7 +58,7 @@ class Gif {
         size: data.size
       });
       form.on('file', function(field, file) {
-        fs.rename(file.path, path.join(form.uploadDir, data.name + '.jpg'));
+        fs.rename(file.path, path.join(form.uploadDir, data.name + '.gif'));
       });
     });
     // log errors
@@ -87,7 +87,7 @@ class Gif {
   }
   setDatabase(database) {
     _database = database;
-    // _database.collection(gifCollection).remove({});
+    _database.collection(gifCollection).remove({});
   }
 }
 

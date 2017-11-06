@@ -7,3 +7,9 @@ SETUP INSTRUCTIONS
 RUNNING THE APPLICATION
 1. Run command "npm run start" on your Terminal. This should run both MongoDB and Node
 2. In case that doesn't work, run command "mongod" and "node index.js" on a seperate instance of the Terminal
+
+
+USING THE APPLICATION
+- Upload any gif you want
+- You must give it a name.
+- Add tags if you wish.
