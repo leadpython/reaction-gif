@@ -84,8 +84,8 @@ var UploadForm = Vue.component('upload-form', {
   template: `
     <div id="upload-form">
       <div id="form">
-        <div><input v-model="name" type="text" @keyup="validate()"></div>
-        <div><input v-model="tag" type="text"><button @click="addTag()"><i style="font-size: 20px;" class="fa fa-plus" aria-hidden="true"></i></button></div>
+        <div><input v-model="name" placeholder="Enter a name for the gif..." type="text" @keyup="validate()"></div>
+        <div><input v-model="tag" placeholder="Enter a tag and press add button -->" type="text"><button @click="addTag()"><i style="font-size: 20px;" class="fa fa-plus" aria-hidden="true"></i></button></div>
         <div><span class="tag" v-for="item in tags">{{item + ' '}}</span></div>
         <div><input id="upload-input" type="file" name="uploads[]"></div>
         <div><button @click="upload()">UPLOAD</button></div>
@@ -217,7 +217,7 @@ var Search = Vue.component('search', {
   },
   template: `
     <div class="page">
-      <div><input id="search" v-model="entry" type="text" @keyup="search()"></div>
+      <div><input id="search" placeholder="Search for your gif..." v-model="entry" type="text" @keyup="search()"></div>
       <div><gif v-for="meme in memes" :meme="meme"></gif></div>
     </div>
   `,
