@@ -87,7 +87,7 @@ class Gif {
   }
   setDatabase(database) {
     _database = database;
-    _database.collection(gifCollection).remove({});
+    // _database.collection(gifCollection).remove({});
   }
 }
 
