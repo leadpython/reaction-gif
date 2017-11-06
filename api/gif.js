@@ -15,7 +15,6 @@ class Gif {
   }
   // GET ALL GIF INFORMATION
   getAll(request, response) {
-    // find user with email
     _database.collection(gifCollection).find({}).toArray(function(err, data) {
       response.json(data);
     });
@@ -26,7 +25,20 @@ class Gif {
   }
   // SEARCH
   search(request, response) {
-
+    var regex = new RegExp(request.params.entry, 'i');
+    var searchInput = [
+      { 'name': { $regex: regex} },
+      { 'tags': { $regex: regex} }
+    ];
+    _database.collection(gifCollection).find({ $or: searchInput }).toArray((error, data) => {
+      response.json(data); 
+    });
+  }
+  // SEARCH TAG
+  searchTag(request, response) {
+    _database.collection(gifCollection).find({ 'tags': request.params.tag }).toArray((error, data) => {
+      response.json(data); 
+    });
   }
   // UPLOAD IMAGE + CREATED DATABASE RECORD
   upload(request, response) {
@@ -59,17 +71,9 @@ class Gif {
     // parse the incoming request containing the form data
     form.parse(request);
   }
-  // LOGIN
-  login(request, response) {
-    let payload = {};
-    // find user with email
-    _database.collection(gifCollection).findOne({ 'email': request.body.email }).then((data) => {
-
-    });
-  }
   setDatabase(database) {
     _database = database;
-    _database.collection(gifCollection).remove({});
+    // _database.collection(gifCollection).remove({});
   }
 }
 

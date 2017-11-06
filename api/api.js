@@ -11,11 +11,15 @@ router.get('/memes', (request, response) => {
 });
 
 router.get('/memes/:id', (request, response) => {
-  gifs.getMeme(request, response);
+  gif.getMeme(request, response);
+});
+
+router.get('/search/tag/:tag', (request, response) => {
+  gif.searchTag(request,response);
 });
 
 router.get('/search/:entry', (request, response) => {
-  gifs.search(request, response);
+  gif.search(request, response);
 });
 
 

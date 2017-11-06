@@ -11,14 +11,24 @@ var Gif = Vue.component('gif', {
   template: `
     <div class="gif-component">
       <div class="image-container"><img :src="'/img/' + meme.name + '.jpg'"></div>
-      <label>Downloads: {{meme.downloads}}</label>
-      <label>Views: {{meme.views}}</label>
-      <label>Date Added: {{added}}</label>
+      <div><label class="name">{{meme.name}}</label></div>
+      <div><span class="tag" v-for="tag in meme.tags" @click="searchTag(tag)">{{tag}}</span></div>
+      <div><label class="added"><strong>ADDED</strong>: {{added}}</label></div>
     </div>
   `,
   computed: {
     added: function() {
-      return this.meme.added;
+      return (new Date(this.meme.added)).toLocaleDateString("en-us", {  
+        weekday: "long", year: "numeric", month: "short",  
+        day: "numeric", hour: "2-digit", minute: "2-digit"
+      });
+    }
+  },
+  methods: {
+    searchTag: function(tag) {
+      axios.get('/api/search/tag/' + tag).then((response) => {
+        EventBus.$emit('searched', response.data);
+      });
     }
   }
 });
@@ -44,15 +54,16 @@ var UploadForm = Vue.component('upload-form', {
     });
   },
   template: `
-    <div id="upload-form" style="position: absolute; z-index: 99999; background: white;">
+    <div id="upload-form">
       <div id="form">
-        <input v-model="name" type="text" @keyup="validate()">
-        <div><input v-model="tag" type="text"><button @click="addTag()">add</button></div>
-        <div><span v-for="item in tags">{{item + ' '}}</span></div>
-        <button @click="chooseFile()">CHOOSE FILE</button>
-        <button @click="upload()">UPLOAD</button>
-        <label v-if="!isName">Name required.</label>
-        <label v-if="!isFile">No file selected.</label>
+        <div><input v-model="name" type="text" @keyup="validate()"></div>
+        <div><input v-model="tag" type="text"><button @click="addTag()"><i style="font-size: 20px;" class="fa fa-plus" aria-hidden="true"></i></button></div>
+        <div><span class="tag" v-for="item in tags">{{item + ' '}}</span></div>
+        <div><input id="upload-input" type="file" name="uploads[]"></div>
+        <div><button @click="upload()">UPLOAD</button></div>
+        <div><button @click="close()">CANCEL</button></div>
+        <div><label v-if="!isName">Name required.</label></div>
+        <div><label v-if="!isFile">No file selected.</label></div>
       </div>
     </div>
   `,
@@ -66,8 +77,8 @@ var UploadForm = Vue.component('upload-form', {
       this.tags.push(this.tag);
       this.tag = "";
     },
-    chooseFile: function() {
-      document.getElementById('upload-input').click();
+    close: function() {
+      EventBus.$emit('closeUploadForm');
     },
     upload: function() {
       if (!this.validate()) { return; }
@@ -82,6 +93,10 @@ var UploadForm = Vue.component('upload-form', {
       formData.append('uploads[]', file);
       formData.append('data', JSON.stringify(info));
       axios.post('/api/upload', formData).then((response) => {
+        EventBus.$emit('wentToCollection');
+        EventBus.$emit('successUpload', {
+          name: self.name,
+        });
         console.log(response);
         console.log('upload successful!');
       });
@@ -91,25 +106,30 @@ var UploadForm = Vue.component('upload-form', {
 
 // UPLOAD DONE POP UP
 var UploadPopUp = Vue.component('upload-popup', {
-  props: ['meme'],
   data: function() {
-
+    return {
+      shown: false
+    }
   },
   created: function() {
     var self = this;
-    EventBus.$on('uploaded', function() {
+    EventBus.$on('successUpload', function(data) {
       self.popup();
     });
   },
   template: `
-    <div class="upload-popup">
-      <span></span>
-      <label>{{meme.name}} UPLOADED</label>
+    <div v-show="shown" id="upload-popup">
+      <span><i class="fa fa-check-circle-o" style="color: green; font-size: 75px;" aria-hidden="true"></i></span>
+      <label>GIF UPLOADED!</label>
     </div>
   `,
   methods: {
     popup: function() {
-
+      var self = this;
+      self.shown = true;
+      setTimeout(function() {
+        self.shown = false;
+      }, 3000);
     }
   }
 });
@@ -133,7 +153,7 @@ var Collection = Vue.component('collection', {
   },
   template: `
     <div class="page">
-      <gif v-for="meme in memes" :meme="meme"></gif>
+      <gif v-for="meme in memes" :meme="meme" :key="meme.name"></gif>
     </div>
   `,
   methods: {
@@ -141,7 +161,9 @@ var Collection = Vue.component('collection', {
       var self = this;
       axios.get('/api/memes').then((response) => {
         if (response) {
-          self.memes = response.data;
+          self.memes = response.data.sort(function(a, b) {
+            return Number(b.added) - Number(a.added);
+          });
         }
       });
     }
@@ -153,14 +175,30 @@ var Search = Vue.component('search', {
   components: { Gif },
   data: function() {
     return {
-
+      entry: "",
+      memes: []
     };
+  },
+  created: function() {
+    var self = this;
+    EventBus.$on('searched', function(data) {
+      self.memes = data;
+    });
   },
   template: `
     <div class="page">
-      SEARCH
+      <div><input id="search" v-model="entry" type="text" @keyup="search()"></div>
+      <div><gif v-for="meme in memes" :meme="meme"></gif></div>
     </div>
-  `
+  `,
+  methods: {
+    search: function() {
+      var self = this;
+      axios.get('/api/search/' + self.entry).then((response) => {
+        self.memes = response.data;
+      });
+    }
+  }
 });
 
 // APPLICATION
@@ -176,15 +214,29 @@ var App = new Vue({
   },
   created: function() {
     var self = this;
+    this.goTo('collection');
     EventBus.$on('showUploadForm', function() {
       self.uploadForm = true;
+    });
+    EventBus.$on('successUpload', function() {
+      self.uploadForm = false;
+    });
+    EventBus.$on('searched', function() {
+      self.goTo('search');
+    });
+    EventBus.$on('closeUploadForm', function() {
+      self.uploadForm = false;
     });
   },
   methods: {
     goTo: function(page) {
       for (var key in this.pages) {
-        this.pages[key] = false;
+        this.pages[key] = false; 
+        document.getElementById('navigation-' + key).style.background = 'transparent';
+        document.getElementById('navigation-' + key).style.color = 'rgb(50,50,50)';
       }
+      document.getElementById('navigation-' + page).style.background = 'rgb(50,50,50)';
+      document.getElementById('navigation-' + page).style.color = 'white';
       this.pages[page] = true;
       if (page === 'collection') { EventBus.$emit('wentToCollection'); }
     },
