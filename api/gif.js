@@ -54,7 +54,8 @@ class Gif {
         tags: data.tags,
         downloads: 0,
         views: 0,
-        added: Date.now()
+        added: Date.now(),
+        size: data.size
       });
       form.on('file', function(field, file) {
         fs.rename(file.path, path.join(form.uploadDir, data.name + '.jpg'));
@@ -70,6 +71,19 @@ class Gif {
     });
     // parse the incoming request containing the form data
     form.parse(request);
+  }
+  viewed(request, response) {
+    var obj = { views: 1 };
+    _database.collection(gifCollection).updateOne({ _id: ObjectId(request.params.id) }, { $inc: obj }, function(error, document) {
+      response.json('viewed');
+    });
+  }
+  // DOWNLOADED
+  downloaded(request, response) {
+    var obj = { downloads: 1}; 
+    _database.collection(gifCollection).updateOne({ _id: ObjectId(request.params.id) }, { $inc: obj }, function(error, document) {
+      response.json('downloaded');
+    });
   }
   setDatabase(database) {
     _database = database;

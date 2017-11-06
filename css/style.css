@@ -118,7 +118,7 @@ div.gif-component {
   position: relative;
   box-sizing: border-box;
   width: 350px;
-  height: 300px;
+  height: 400px;
   margin: 10px;
   color: rgb(50,50,50);
   border: 1px solid rgb(150,150,150);
@@ -172,7 +172,6 @@ div.gif-component label.added {
   padding: 0px 5px;
 }
 
-
 /* UPLOAD POP UP*/
 div#upload-popup {
   position: absolute;
@@ -183,7 +182,6 @@ div#upload-popup {
   z-index: 99999;
   text-align: center;
   font-size: 20px;
-
   font-weight: bold;
 }
 

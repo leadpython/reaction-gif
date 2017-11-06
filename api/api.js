@@ -22,6 +22,14 @@ router.get('/search/:entry', (request, response) => {
   gif.search(request, response);
 });
 
+router.put('/memes/downloaded/:id', (request, response) => {
+  gif.downloaded(request, response);
+});
+
+router.put('/memes/viewed/:id', (request, response) => {
+  gif.viewed(request, response);
+});
+
 
 router.get('/img', (request, response) => {
   gif.img(request, response);

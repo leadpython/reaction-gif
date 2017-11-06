@@ -8,12 +8,20 @@ var Gif = Vue.component('gif', {
 
     };
   },
+  mounted: function() {
+    this.view();
+  },
   template: `
     <div class="gif-component">
-      <div class="image-container"><img :src="'/img/' + meme.name + '.jpg'"></div>
+      <div class="image-container"><img :id="'gif-image-' + meme.name" :src="'/img/' + meme.name + '.jpg'"></div>
       <div><label class="name">{{meme.name}}</label></div>
       <div><span class="tag" v-for="tag in meme.tags" @click="searchTag(tag)">{{tag}}</span></div>
+      <div>
+        <label style="font-size: 12px; margin: 0;"><strong>DOWNLOADS</strong>: {{meme.downloads}}</label>
+        <label style="font-size: 12px; margin: 0;"><strong>VIEWS</strong>: {{meme.views}}</label>
+      </div>
       <div><label class="added"><strong>ADDED</strong>: {{added}}</label></div>
+      <div><button @click="download(this)">DOWNLOAD</button></div>
     </div>
   `,
   computed: {
@@ -25,6 +33,26 @@ var Gif = Vue.component('gif', {
     }
   },
   methods: {
+    view: function() {
+      var self = this;
+      axios.put('/api/memes/viewed/' + this.meme._id).then((response) => {
+        console.log(response);
+        self.meme.views++;
+      });
+    },
+    download: function() {
+      var self = this;
+      var image = document.getElementById('gif-image-' + this.meme.name);
+      var a = document.createElement('a');
+      a.href = image.src;
+      a.download = this.meme.name + '.jpg';
+      a.click();
+      axios.put('/api/memes/downloaded/' + this.meme._id).then((response) => {
+        console.log(response);
+        self.meme.download++;
+      });
+      delete a;
+    },
     searchTag: function(tag) {
       axios.get('/api/search/tag/' + tag).then((response) => {
         EventBus.$emit('searched', response.data);
@@ -87,7 +115,8 @@ var UploadForm = Vue.component('upload-form', {
       var formData = new FormData();
       var info = {
         name: self.name,
-        tags: self.tags
+        tags: self.tags,
+        size: file.size
       };
 
       formData.append('uploads[]', file);
@@ -139,7 +168,8 @@ var Collection = Vue.component('collection', {
   components: { Gif },
   data: function() {
     return {
-      memes: []
+      memes: [],
+      sortType: 1
     };
   },
   created: function() {
